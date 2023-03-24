@@ -32,8 +32,8 @@ public class Main {
 
         // Parallel
         long time2 = System.currentTimeMillis();
-        Arrays.parallelSetAll(result, i -> input1[i] * input2[i]);
-        Arrays.stream(result).forEach(e ->{
+        IntStream.range(0, N).parallel().forEach(i -> {
+            result[i] = input1[i] * input2[i];
             try {
                 Thread.sleep(sleep2);
             } catch (InterruptedException ex) {
