@@ -1,9 +1,5 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.io.*;
+import java.time.LocalDateTime;
 
 public class Main {
     private static volatile int counter = 0;
@@ -27,24 +23,27 @@ public class Main {
     }
 
     private static class Task implements Runnable {
-        private final long timeSleep;
         private final String threadName;
-        public Task(String threadName, long timeSleep) {
-            this.timeSleep = timeSleep;
+        private final int delay;
+
+        public Task(String threadName, int delay) {
             this.threadName = threadName;
+            this.delay = delay;
         }
 
         @Override
         public void run() {
-            try(PrintWriter writer = new PrintWriter(new FileWriter("D:\\POE\\Lab5\\file.txt",true))){
-                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-                while(!Thread.currentThread().isInterrupted() && counter <=240){
-                    writer.printf("%s: %s - %d%n",threadName,dateFormat.format(new Date()),counter++);
-                    Thread.sleep(timeSleep);
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\POE\\Lab5\\file.txt", true))) {
+                while (!Thread.interrupted() && counter <= 240) {
+                    LocalDateTime now = LocalDateTime.now();
+                    String line = String.format("%s - %s - %d\n", threadName, now.toString(), counter);
+                    writer.write(line);
+                    writer.flush();
+                    counter++;
+                    Thread.sleep(delay);
                 }
             } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }
